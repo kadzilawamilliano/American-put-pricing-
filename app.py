@@ -3,6 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
+# Import extra tabs
+from comparison import comparison_tab
+from convergence import convergence_tab
+from export_report import export_report_tab
+
 
 # =====================================================
 # American Put Option Pricing Using Finite Difference Methods
@@ -17,22 +22,35 @@ import pandas as pd
 
 
 # ==========================
-# Title and Description
+# Page Configuration
 # ==========================
 
-st.title("American Put Option Pricing Using Finite Difference Methods")
+st.set_page_config(
+    page_title="American Put FDM",
+    layout="wide"
+)
+
+
+# ==========================
+# Title
+# ==========================
+
+st.title(
+    "American Put Option Pricing Using Finite Difference Methods"
+)
+
 
 st.write("""
-## Developer
+### Developer
 **Milliano Benjamin Kadzilawa**
 
-## Problem Description
+### Problem Description
 
 American options allow the holder to exercise the option at any time
 before maturity.
 
 Unlike European options, American options generally do not have a
-closed-form analytical solution, therefore numerical methods are required.
+closed-form analytical solution. Therefore numerical methods are required.
 
 This project compares:
 
@@ -45,56 +63,53 @@ for pricing an American put option.
 
 
 # ==========================
-# Black-Scholes PDE
+# Mathematical Model
 # ==========================
 
-st.subheader("Black-Scholes PDE")
+with st.expander("Show Mathematical Formulation"):
 
-st.latex(
-r"""
-\frac{\partial V}{\partial t}
-+
-\frac{1}{2}\sigma^2S^2
-\frac{\partial^2 V}{\partial S^2}
-+
-rS\frac{\partial V}{\partial S}
--rV=0
-"""
+    st.subheader("Black-Scholes PDE")
+
+    st.latex(
+    r"""
+    \frac{\partial V}{\partial t}
+    +
+    \frac{1}{2}\sigma^2S^2
+    \frac{\partial^2V}{\partial S^2}
+    +
+    rS\frac{\partial V}{\partial S}
+    -
+    rV=0
+    """
+    )
+
+
+    st.subheader("Terminal Condition")
+
+    st.latex(
+    r"""
+    V(S,T)=\max(K-S,0)
+    """
+    )
+
+
+    st.subheader("Early Exercise Condition")
+
+    st.latex(
+    r"""
+    V(S,t)=\max(V(S,t),K-S)
+    """
+    )
+
+
+
+# ==========================
+# Sidebar Inputs
+# ==========================
+
+st.sidebar.header(
+    "Option Parameters"
 )
-
-
-# ==========================
-# American Put Conditions
-# ==========================
-
-st.subheader("American Put Conditions")
-
-st.write("""
-Terminal payoff:
-""")
-
-st.latex(
-r"""
-V(S,T)=\max(K-S,0)
-"""
-)
-
-st.write("""
-Early exercise condition:
-""")
-
-st.latex(
-r"""
-V(S,t)=\max(V(S,t),K-S)
-"""
-)
-
-
-# ==========================
-# User Inputs
-# ==========================
-
-st.sidebar.header("Option Parameters")
 
 
 K = st.sidebar.number_input(
@@ -127,8 +142,6 @@ sigma = st.sidebar.number_input(
 )
 
 
-# Numerical grid parameters
-
 M = st.sidebar.number_input(
     "Space Steps (M)",
     value=100
@@ -141,7 +154,25 @@ N = st.sidebar.number_input(
 )
 
 
-st.write("Parameters loaded successfully ✅")
+
+# ==========================
+# Tabs
+# ==========================
+
+tab1, tab2, tab3, tab4 = st.tabs(
+[
+    "🧮 Numerical Methods",
+    "📊 Comparison",
+    "📈 Convergence",
+    "📄 Export Report"
+]
+)
+
+# =====================================================
+# Numerical Methods
+# =====================================================
+
+
 # ==========================================
 # Explicit Finite Difference Method
 # American Put
@@ -151,123 +182,6 @@ def explicit_american_put(K, S0, T, r, sigma, M, N):
 
     S_max = 2*K
 
-    dS = S_max / M
-    dt = T / N
-
-    # Stock price grid
-    S = np.linspace(0, S_max, M+1)
-
-
-    # Terminal payoff
-    V = np.maximum(K-S, 0)
-
-
-    # Coefficients
-
-    i = np.arange(1, M)
-
-    a = 0.5*dt*(sigma**2*i**2 - r*i)
-
-    b = 1 - dt*(sigma**2*i**2 + r)
-
-    c = 0.5*dt*(sigma**2*i**2 + r*i)
-
-
-
-    # Backward time stepping
-
-    for n in range(N):
-
-        V_old = V.copy()
-
-
-        for j in range(1, M):
-
-            V[j] = (
-                a[j-1]*V_old[j-1]
-                +
-                b[j-1]*V_old[j]
-                +
-                c[j-1]*V_old[j+1]
-            )
-
-
-        # American early exercise condition
-
-        V = np.maximum(
-            V,
-            K-S
-        )
-
-
-        # Boundary conditions
-
-        V[0] = K
-
-        V[-1] = 0
-
-
-
-    # Option value at S0
-
-    price = np.interp(
-        S0,
-        S,
-        V
-    )
-
-
-    return price, S, V
-
-# ==========================================
-# Run Explicit Method
-# ==========================================
-
-if st.button("Calculate American Put Price"):
-
-
-    price, S, V = explicit_american_put(
-        K,
-        S0,
-        T,
-        r,
-        sigma,
-        M,
-        N
-    )
-
-
-    st.success(
-        f"Explicit Method Price = {price:.4f}"
-    )
-
-
-    fig, ax = plt.subplots()
-
-    ax.plot(S,V)
-
-    ax.set_xlabel("Stock Price")
-
-    ax.set_ylabel("Option Value")
-
-    ax.set_title(
-        "American Put Price - Explicit Method"
-    )
-
-    ax.grid()
-
-
-    st.pyplot(fig)
-# ==========================================
-# Implicit Finite Difference Method
-# American Put
-# ==========================================
-
-def implicit_american_put(K, S0, T, r, sigma, M, N):
-
-    S_max = 2*K
-
-    dS = S_max/M
     dt = T/N
 
     S = np.linspace(0, S_max, M+1)
@@ -280,107 +194,75 @@ def implicit_american_put(K, S0, T, r, sigma, M, N):
 
     a = 0.5*dt*(sigma**2*i**2-r*i)
 
-    b = 1+dt*(sigma**2*i**2+r)
+    b = 1-dt*(sigma**2*i**2+r)
 
     c = 0.5*dt*(sigma**2*i**2+r*i)
 
 
-    # Matrix construction
-
-    A = np.zeros((M-1,M-1))
-
-
-    for j in range(M-1):
-
-        A[j,j] = b[j]
-
-        if j > 0:
-            A[j,j-1] = -a[j]
-
-        if j < M-2:
-            A[j,j+1] = -c[j]
-
-
-
-    # Time stepping
 
     for n in range(N):
 
-        rhs = V[1:M].copy()
+        V_old = V.copy()
 
 
-        V_new = np.linalg.solve(A,rhs)
+        for j in range(1,M):
 
-
-        V[1:M] = V_new
+            V[j] = (
+                a[j-1]*V_old[j-1]
+                +
+                b[j-1]*V_old[j]
+                +
+                c[j-1]*V_old[j+1]
+            )
 
 
         # Early exercise
 
-        V = np.maximum(V,K-S)
+        V = np.maximum(
+            V,
+            K-S
+        )
 
 
         # Boundary conditions
 
         V[0] = K
-
         V[-1] = 0
 
 
 
-    price = np.interp(S0,S,V)
+    price = np.interp(
+        S0,
+        S,
+        V
+    )
 
 
     return price,S,V
 
-if st.button("Calculate Implicit Method"):
-
-    price,S,V = implicit_american_put(
-        K,
-        S0,
-        T,
-        r,
-        sigma,
-        M,
-        N
-    )
-
-    st.success(
-        f"Implicit Method Price = {price:.4f}"
-    )
 
 
-    fig,ax = plt.subplots()
 
-    ax.plot(S,V)
 
-    ax.set_title(
-        "American Put - Implicit Method"
-    )
-
-    ax.set_xlabel("Stock Price")
-    ax.set_ylabel("Option Value")
-
-    ax.grid()
-
-    st.pyplot(fig)
 # ==========================================
-# Crank-Nicolson Method
+# Implicit Finite Difference Method
 # American Put
 # ==========================================
 
-def crank_nicolson_american_put(K, S0, T, r, sigma, M, N):
+
+def implicit_american_put(K, S0, T, r, sigma, M, N):
 
     S_max = 2*K
 
-    dS = S_max/M
     dt = T/N
 
 
-    S = np.linspace(0, S_max, M+1)
+    S = np.linspace(
+        0,
+        S_max,
+        M+1
+    )
 
-
-    # Initial payoff
 
     V = np.maximum(K-S,0)
 
@@ -388,7 +270,118 @@ def crank_nicolson_american_put(K, S0, T, r, sigma, M, N):
     i = np.arange(1,M)
 
 
-    # Coefficients
+
+    a = 0.5*dt*(sigma**2*i**2-r*i)
+
+    b = 1+dt*(sigma**2*i**2+r)
+
+    c = 0.5*dt*(sigma**2*i**2+r*i)
+
+
+
+    A = np.zeros(
+        (M-1,M-1)
+    )
+
+
+    for j in range(M-1):
+
+        A[j,j] = b[j]
+
+
+        if j > 0:
+
+            A[j,j-1] = -a[j]
+
+
+        if j < M-2:
+
+            A[j,j+1] = -c[j]
+
+
+
+
+    for n in range(N):
+
+
+        rhs = V[1:M].copy()
+
+
+        V_new = np.linalg.solve(
+            A,
+            rhs
+        )
+
+
+        V[1:M] = V_new
+
+
+
+        # Early exercise
+
+        V = np.maximum(
+            V,
+            K-S
+        )
+
+
+
+        V[0] = K
+
+        V[-1] = 0
+
+
+
+    price = np.interp(
+        S0,
+        S,
+        V
+    )
+
+
+    return price,S,V
+
+
+
+
+
+# ==========================================
+# Crank-Nicolson Method
+# American Put
+# ==========================================
+
+
+def crank_nicolson_american_put(
+    K,
+    S0,
+    T,
+    r,
+    sigma,
+    M,
+    N
+):
+
+    S_max = 2*K
+
+    dt = T/N
+
+
+    S = np.linspace(
+        0,
+        S_max,
+        M+1
+    )
+
+
+    V = np.maximum(
+        K-S,
+        0
+    )
+
+
+    i = np.arange(1,M)
+
+
 
     a = 0.25*dt*(sigma**2*i**2-r*i)
 
@@ -398,14 +391,16 @@ def crank_nicolson_american_put(K, S0, T, r, sigma, M, N):
 
 
 
-    # Matrix A (implicit side)
 
-    A = np.zeros((M-1,M-1))
+    A = np.zeros(
+        (M-1,M-1)
+    )
 
 
-    # Matrix B (explicit side)
+    B = np.zeros(
+        (M-1,M-1)
+    )
 
-    B = np.zeros((M-1,M-1))
 
 
     for j in range(M-1):
@@ -415,14 +410,16 @@ def crank_nicolson_american_put(K, S0, T, r, sigma, M, N):
         B[j,j] = 1+b[j]
 
 
-        if j>0:
+
+        if j > 0:
 
             A[j,j-1] = -a[j]
 
             B[j,j-1] = a[j]
 
 
-        if j<M-2:
+
+        if j < M-2:
 
             A[j,j+1] = -c[j]
 
@@ -430,7 +427,6 @@ def crank_nicolson_american_put(K, S0, T, r, sigma, M, N):
 
 
 
-    # Time stepping
 
     for n in range(N):
 
@@ -438,63 +434,215 @@ def crank_nicolson_american_put(K, S0, T, r, sigma, M, N):
         rhs = B @ V[1:M]
 
 
-        V_new = np.linalg.solve(A,rhs)
+        V_new = np.linalg.solve(
+            A,
+            rhs
+        )
 
 
         V[1:M] = V_new
 
 
 
-        # American early exercise
+        # Early exercise
 
-        V = np.maximum(V,K-S)
-
-
-
-        # Boundary conditions
-
-        V[0]=K
-
-        V[-1]=0
+        V = np.maximum(
+            V,
+            K-S
+        )
 
 
 
-    price = np.interp(S0,S,V)
+        V[0] = K
+
+        V[-1] = 0
+
+
+
+
+    price = np.interp(
+        S0,
+        S,
+        V
+    )
 
 
     return price,S,V
-if st.button("Calculate Crank-Nicolson Method"):
+
+# =====================================================
+# Tab 1: Numerical Methods
+# =====================================================
+
+with tab1:
+
+    st.header("Individual Finite Difference Methods")
 
 
-    price,S,V = crank_nicolson_american_put(
+    method = st.selectbox(
+        "Choose Method",
+        [
+            "Explicit",
+            "Implicit",
+            "Crank-Nicolson"
+        ]
+    )
+
+
+    if st.button("Calculate Price"):
+
+
+        if method == "Explicit":
+
+            price,S,V = explicit_american_put(
+                K,
+                S0,
+                T,
+                r,
+                sigma,
+                M,
+                N
+            )
+
+
+        elif method == "Implicit":
+
+            price,S,V = implicit_american_put(
+                K,
+                S0,
+                T,
+                r,
+                sigma,
+                M,
+                N
+            )
+
+
+        else:
+
+            price,S,V = crank_nicolson_american_put(
+                K,
+                S0,
+                T,
+                r,
+                sigma,
+                M,
+                N
+            )
+
+
+
+        st.success(
+            f"{method} Method Price = {price:.4f}"
+        )
+
+
+
+        fig, ax = plt.subplots()
+
+
+        ax.plot(
+            S,
+            V
+        )
+
+
+        ax.set_xlabel(
+            "Stock Price"
+        )
+
+
+        ax.set_ylabel(
+            "Option Value"
+        )
+
+
+        ax.set_title(
+            f"American Put - {method}"
+        )
+
+
+        ax.grid(True)
+
+
+        st.pyplot(fig)
+
+
+
+# =====================================================
+# Tab 2: Comparison
+# =====================================================
+
+with tab2:
+
+    comparison_tab(
         K,
         S0,
         T,
         r,
         sigma,
         M,
-        N
+        N,
+        explicit_american_put,
+        implicit_american_put,
+        crank_nicolson_american_put
     )
 
 
-    st.success(
-        f"Crank-Nicolson Price = {price:.4f}"
+
+# =====================================================
+# Tab 3: Convergence Analysis
+# =====================================================
+
+with tab3:
+
+    convergence_tab(
+        K,
+        S0,
+        T,
+        r,
+        sigma,
+        explicit_american_put,
+        implicit_american_put,
+        crank_nicolson_american_put
     )
 
 
-    fig,ax = plt.subplots()
 
-    ax.plot(S,V)
+# =====================================================
+# Tab 4: Export Report
+# =====================================================
 
-    ax.set_title(
-        "American Put - Crank-Nicolson"
+with tab4:
+
+    export_report_tab(
+        K,
+        S0,
+        T,
+        r,
+        sigma,
+        M,
+        N,
+        explicit_american_put,
+        implicit_american_put,
+        crank_nicolson_american_put
     )
 
-    ax.set_xlabel("Stock Price")
-
-    ax.set_ylabel("Option Value")
-
-    ax.grid()
 
 
-    st.pyplot(fig)
+# =====================================================
+# Footer
+# =====================================================
+
+st.markdown("---")
+
+st.caption(
+"""
+Developed by:
+
+Milliano Benjamin Kadzilawa
+
+BSc Actuarial Science (Honours)
+
+University of Malawi
+"""
+)
