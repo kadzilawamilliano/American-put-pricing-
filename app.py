@@ -258,3 +258,109 @@ if st.button("Calculate American Put Price"):
 
 
     st.pyplot(fig)
+# ==========================================
+# Implicit Finite Difference Method
+# American Put
+# ==========================================
+
+def implicit_american_put(K, S0, T, r, sigma, M, N):
+
+    S_max = 2*K
+
+    dS = S_max/M
+    dt = T/N
+
+    S = np.linspace(0, S_max, M+1)
+
+    V = np.maximum(K-S,0)
+
+
+    i = np.arange(1,M)
+
+
+    a = 0.5*dt*(sigma**2*i**2-r*i)
+
+    b = 1+dt*(sigma**2*i**2+r)
+
+    c = 0.5*dt*(sigma**2*i**2+r*i)
+
+
+    # Matrix construction
+
+    A = np.zeros((M-1,M-1))
+
+
+    for j in range(M-1):
+
+        A[j,j] = b[j]
+
+        if j > 0:
+            A[j,j-1] = -a[j]
+
+        if j < M-2:
+            A[j,j+1] = -c[j]
+
+
+
+    # Time stepping
+
+    for n in range(N):
+
+        rhs = V[1:M].copy()
+
+
+        V_new = np.linalg.solve(A,rhs)
+
+
+        V[1:M] = V_new
+
+
+        # Early exercise
+
+        V = np.maximum(V,K-S)
+
+
+        # Boundary conditions
+
+        V[0] = K
+
+        V[-1] = 0
+
+
+
+    price = np.interp(S0,S,V)
+
+
+    return price,S,V
+
+if st.button("Calculate Implicit Method"):
+
+    price,S,V = implicit_american_put(
+        K,
+        S0,
+        T,
+        r,
+        sigma,
+        M,
+        N
+    )
+
+    st.success(
+        f"Implicit Method Price = {price:.4f}"
+    )
+
+
+    fig,ax = plt.subplots()
+
+    ax.plot(S,V)
+
+    ax.set_title(
+        "American Put - Implicit Method"
+    )
+
+    ax.set_xlabel("Stock Price")
+    ax.set_ylabel("Option Value")
+
+    ax.grid()
+
+    st.pyplot(fig)
