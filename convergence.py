@@ -10,12 +10,15 @@ def convergence_tab(
     T,
     r,
     sigma,
+    M,
+    N,
     explicit_american_put,
     implicit_american_put,
     crank_nicolson_american_put
 ):
 
     st.header("Convergence Analysis")
+
 
     st.write("""
 Convergence analysis investigates how the numerical solution changes
@@ -29,135 +32,199 @@ solution as the mesh is refined.
     # ==========================================
     # Analysis Level
     # ==========================================
-  # ==========================================
-# Analysis Level
-# ==========================================
 
-analysis_level = st.selectbox(
-    "Select Analysis Level",
-    [
-        "Quick",
-        "Standard",
-        "Detailed"
-    ]
-)
+    analysis_level = st.selectbox(
+        "Select Analysis Level",
+        [
+            "Quick",
+            "Standard",
+            "Detailed"
+        ]
+    )
 
 
-# Use the user's chosen grid as the maximum grid
-max_M = int(M)
-max_N = int(N)
+    # User selected maximum grid
+
+    max_M = int(M)
+
+    max_N = int(N)
 
 
-if analysis_level == "Quick":
+    # Limit convergence computation
 
-    grids = [
+    max_M = min(max_M,120)
 
-        (
-            max(10, max_M//4),
-            max(50, max_N//4)
-        ),
-
-        (
-            max(20, max_M//2),
-            max(100, max_N//2)
-        ),
-
-        (
-            max_M,
-            max_N
-        )
-    ]
+    max_N = min(max_N,600)
 
 
-elif analysis_level == "Standard":
 
-    grids = [
+    if analysis_level == "Quick":
 
-        (
-            max(10, max_M//4),
-            max(50, max_N//4)
-        ),
+        grids = [
 
-        (
-            max(20, max_M//2),
-            max(100, max_N//2)
-        ),
+            (
+                max(10,max_M//4),
+                max(50,max_N//4)
+            ),
 
-        (
-            max(30, (3*max_M)//4),
-            max(150, (3*max_N)//4)
-        ),
+            (
+                max(20,max_M//2),
+                max(100,max_N//2)
+            ),
 
-        (
-            max_M,
-            max_N
-        )
-    ]
+            (
+                max_M,
+                max_N
+            )
+
+        ]
 
 
-else:
+    elif analysis_level == "Standard":
 
-    grids = [
+        grids = [
 
-        (
-            max(10, max_M//5),
-            max(40, max_N//5)
-        ),
+            (
+                max(10,max_M//4),
+                max(50,max_N//4)
+            ),
 
-        (
-            max(20, (2*max_M)//5),
-            max(80, (2*max_N)//5)
-        ),
+            (
+                max(20,max_M//2),
+                max(100,max_N//2)
+            ),
 
-        (
-            max(30, (3*max_M)//5),
-            max(120, (3*max_N)//5)
-        ),
+            (
+                max(30,(3*max_M)//4),
+                max(150,(3*max_N)//4)
+            ),
 
-        (
-            max(40, (4*max_M)//5),
-            max(160, (4*max_N)//5)
-        ),
+            (
+                max_M,
+                max_N
+            )
 
-        (
-            max_M,
-            max_N
-        )
-    ]
+        ]
+
+
+    else:
+
+        grids = [
+
+            (
+                max(10,max_M//5),
+                max(40,max_N//5)
+            ),
+
+            (
+                max(20,(2*max_M)//5),
+                max(80,(2*max_N)//5)
+            ),
+
+            (
+                max(30,(3*max_M)//5),
+                max(120,(3*max_N)//5)
+            ),
+
+            (
+                max(40,(4*max_M)//5),
+                max(160,(4*max_N)//5)
+            ),
+
+            (
+                max_M,
+                max_N
+            )
+
+        ]
+
+
+
     st.info(
 f"""
-Analysis Level: **{analysis_level}**
+Analysis Level: {analysis_level}
 
-Maximum Grid Selected
+Maximum Grid:
 
-• Space Steps (M) = {max_M}
+Space Steps (M): {max_M}
 
-• Time Steps (N) = {max_N}
+Time Steps (N): {max_N}
 
-The convergence study will automatically build
-progressively finer computational grids ending
-at your selected values.
+The convergence study automatically creates
+progressively finer grids.
 """
     )
 
 
+    st.subheader("Grid Levels")
 
-            # ===================================
-            # Explicit Stability Check
-            # ===================================
+
+    grid_df = pd.DataFrame(
+        grids,
+        columns=[
+            "Space Steps (M)",
+            "Time Steps (N)"
+        ]
+    )
+
+
+    st.dataframe(
+        grid_df,
+        use_container_width=True
+    )
+
+
+
+    if st.button("Run Convergence Analysis"):
+
+
+        start = time.time()
+
+
+        progress = st.progress(0)
+
+        status = st.empty()
+
+        table_placeholder = st.empty()
+
+
+        results = []
+
+
+        total = len(grids)
+
+
+
+        for index,(M_grid,N_grid) in enumerate(grids):
+
+
+            status.write(
+                f"""
+Running grid {index+1}/{total}
+
+M = {M_grid}
+
+N = {N_grid}
+"""
+            )
+
+
+            # ==================================
+            # Stability Check
+            # ==================================
 
             S_max = 2*K
 
-            dS = S_max/M
+            dS = S_max/M_grid
 
-            dt = T/N
+            dt = T/N_grid
 
 
             stability_parameter = (
                 sigma**2 *
                 S_max**2 *
                 dt /
-                (dS**2)
+                dS**2
             )
 
 
@@ -171,9 +238,9 @@ at your selected values.
 
 
 
-            # ===================================
-            # Explicit Method
-            # ===================================
+            # ==================================
+            # Explicit
+            # ==================================
 
             explicit_price,_,_ = explicit_american_put(
                 K,
@@ -181,15 +248,14 @@ at your selected values.
                 T,
                 r,
                 sigma,
-                M,
-                N
+                M_grid,
+                N_grid
             )
 
 
-
-            # ===================================
-            # Implicit Method
-            # ===================================
+            # ==================================
+            # Implicit
+            # ==================================
 
             implicit_price,_,_ = implicit_american_put(
                 K,
@@ -197,15 +263,14 @@ at your selected values.
                 T,
                 r,
                 sigma,
-                M,
-                N
+                M_grid,
+                N_grid
             )
 
 
-
-            # ===================================
-            # Crank-Nicolson Method
-            # ===================================
+            # ==================================
+            # Crank Nicolson
+            # ==================================
 
             cn_price,_,_ = crank_nicolson_american_put(
                 K,
@@ -213,16 +278,17 @@ at your selected values.
                 T,
                 r,
                 sigma,
-                M,
-                N
+                M_grid,
+                N_grid
             )
-
-
+                        # ==================================
+            # Store Results
+            # ==================================
 
             results.append(
                 [
-                    M,
-                    N,
+                    M_grid,
+                    N_grid,
                     round(explicit_price,6),
                     explicit_status,
                     round(implicit_price,6),
@@ -247,6 +313,8 @@ at your selected values.
             )
 
 
+            # Update table while running
+
             table_placeholder.dataframe(
                 convergence_df,
                 use_container_width=True
@@ -256,13 +324,16 @@ at your selected values.
             progress.progress(
                 (index+1)/total
             )
-        # ==========================================
-        # Finished Calculations
-        # ==========================================
+
+
+
+        # ==================================
+        # Completion
+        # ==================================
 
         end = time.time()
 
-        runtime = end - start
+        runtime = end-start
 
 
         status.success(
@@ -275,20 +346,23 @@ at your selected values.
         )
 
 
-        # ==========================================
-        # Summary Statistics
-        # ==========================================
 
-        st.subheader("Summary Statistics")
+        # ==================================
+        # Summary
+        # ==================================
+
+        st.subheader(
+            "Final Grid Results"
+        )
 
 
-        col1, col2, col3 = st.columns(3)
+        col1,col2,col3 = st.columns(3)
 
 
         with col1:
 
             st.metric(
-                "Final Explicit Price",
+                "Explicit",
                 f"{convergence_df['Explicit'].iloc[-1]:.6f}"
             )
 
@@ -296,7 +370,7 @@ at your selected values.
         with col2:
 
             st.metric(
-                "Final Implicit Price",
+                "Implicit",
                 f"{convergence_df['Implicit'].iloc[-1]:.6f}"
             )
 
@@ -304,28 +378,30 @@ at your selected values.
         with col3:
 
             st.metric(
-                "Final Crank-Nicolson Price",
+                "Crank-Nicolson",
                 f"{convergence_df['Crank-Nicolson'].iloc[-1]:.6f}"
             )
 
 
-        # ==========================================
+
+        # ==================================
         # Convergence Plot
-        # ==========================================
+        # ==================================
 
         st.subheader(
             "Convergence Plot"
         )
 
 
-        fig, ax = plt.subplots(figsize=(9,5))
+        fig,ax = plt.subplots(
+            figsize=(9,5)
+        )
 
 
         ax.plot(
             convergence_df["Space Steps (M)"],
             convergence_df["Explicit"],
             marker="o",
-            linewidth=2,
             label="Explicit"
         )
 
@@ -334,7 +410,6 @@ at your selected values.
             convergence_df["Space Steps (M)"],
             convergence_df["Implicit"],
             marker="s",
-            linewidth=2,
             label="Implicit"
         )
 
@@ -343,7 +418,6 @@ at your selected values.
             convergence_df["Space Steps (M)"],
             convergence_df["Crank-Nicolson"],
             marker="^",
-            linewidth=2,
             label="Crank-Nicolson"
         )
 
@@ -359,7 +433,7 @@ at your selected values.
 
 
         ax.set_title(
-            "Convergence of Finite Difference Methods"
+            "Finite Difference Method Convergence"
         )
 
 
@@ -367,12 +441,14 @@ at your selected values.
 
         ax.legend()
 
+
         st.pyplot(fig)
 
 
-        # ==========================================
-        # Download Results
-        # ==========================================
+
+        # ==================================
+        # Download CSV
+        # ==================================
 
         csv = convergence_df.to_csv(
             index=False
@@ -381,7 +457,7 @@ at your selected values.
 
         st.download_button(
 
-            label="Download Convergence Results (CSV)",
+            label="Download Convergence Results",
 
             data=csv,
 
@@ -392,9 +468,10 @@ at your selected values.
         )
 
 
-        # ==========================================
+
+        # ==================================
         # Interpretation
-        # ==========================================
+        # ==================================
 
         st.subheader(
             "Interpretation"
@@ -403,48 +480,20 @@ at your selected values.
 
         st.write(
         """
-As the computational grid becomes finer, the numerical
-solutions become more stable, indicating convergence.
+As the number of grid points increases, the numerical
+solutions approach a stable value, demonstrating convergence.
 
-The Explicit finite difference method is conditionally
-stable. The stability column indicates whether the chosen
-grid satisfies the stability condition.
+The Explicit finite difference method is conditionally stable,
+therefore the stability condition is checked for every grid.
 
-The Implicit method remains numerically stable for all
-grid sizes considered because it is an unconditionally
-stable scheme.
+The Implicit method is unconditionally stable because it solves
+a system of equations at each time step.
 
-The Crank–Nicolson method combines the advantages of the
-Explicit and Implicit methods, generally producing highly
-accurate and stable option prices.
+The Crank-Nicolson method combines Explicit and Implicit schemes,
+providing improved accuracy and stability.
 
-The convergence results demonstrate that all three methods
-approach a consistent numerical solution as the mesh is
-refined.
-"""
-        )
-
-
-        # ==========================================
-        # Recommendations
-        # ==========================================
-
-        st.subheader(
-            "Recommendation"
-        )
-
-
-        st.info(
-        """
-For this project:
-
-• Quick Analysis is recommended for testing.
-
-• Standard Analysis provides a good balance
-  between computational speed and numerical
-  accuracy.
-
-• Detailed Analysis should be used only when
-  a more refined convergence study is required.
+For this project, the Standard analysis level provides a good
+balance between computational efficiency and convergence
+demonstration.
 """
         )
