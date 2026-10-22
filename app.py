@@ -364,3 +364,137 @@ if st.button("Calculate Implicit Method"):
     ax.grid()
 
     st.pyplot(fig)
+# ==========================================
+# Crank-Nicolson Method
+# American Put
+# ==========================================
+
+def crank_nicolson_american_put(K, S0, T, r, sigma, M, N):
+
+    S_max = 2*K
+
+    dS = S_max/M
+    dt = T/N
+
+
+    S = np.linspace(0, S_max, M+1)
+
+
+    # Initial payoff
+
+    V = np.maximum(K-S,0)
+
+
+    i = np.arange(1,M)
+
+
+    # Coefficients
+
+    a = 0.25*dt*(sigma**2*i**2-r*i)
+
+    b = -0.5*dt*(sigma**2*i**2+r)
+
+    c = 0.25*dt*(sigma**2*i**2+r*i)
+
+
+
+    # Matrix A (implicit side)
+
+    A = np.zeros((M-1,M-1))
+
+
+    # Matrix B (explicit side)
+
+    B = np.zeros((M-1,M-1))
+
+
+    for j in range(M-1):
+
+        A[j,j] = 1-b[j]
+
+        B[j,j] = 1+b[j]
+
+
+        if j>0:
+
+            A[j,j-1] = -a[j]
+
+            B[j,j-1] = a[j]
+
+
+        if j<M-2:
+
+            A[j,j+1] = -c[j]
+
+            B[j,j+1] = c[j]
+
+
+
+    # Time stepping
+
+    for n in range(N):
+
+
+        rhs = B @ V[1:M]
+
+
+        V_new = np.linalg.solve(A,rhs)
+
+
+        V[1:M] = V_new
+
+
+
+        # American early exercise
+
+        V = np.maximum(V,K-S)
+
+
+
+        # Boundary conditions
+
+        V[0]=K
+
+        V[-1]=0
+
+
+
+    price = np.interp(S0,S,V)
+
+
+    return price,S,V
+if st.button("Calculate Crank-Nicolson Method"):
+
+
+    price,S,V = crank_nicolson_american_put(
+        K,
+        S0,
+        T,
+        r,
+        sigma,
+        M,
+        N
+    )
+
+
+    st.success(
+        f"Crank-Nicolson Price = {price:.4f}"
+    )
+
+
+    fig,ax = plt.subplots()
+
+    ax.plot(S,V)
+
+    ax.set_title(
+        "American Put - Crank-Nicolson"
+    )
+
+    ax.set_xlabel("Stock Price")
+
+    ax.set_ylabel("Option Value")
+
+    ax.grid()
+
+
+    st.pyplot(fig)
