@@ -319,7 +319,9 @@ N = {N_grid}
                 convergence_df,
                 use_container_width=True
             )
+            # Save convergence results for PDF export
 
+st.session_state["convergence_results"] = convergence_df
 
             progress.progress(
                 (index+1)/total
