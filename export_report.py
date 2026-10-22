@@ -1,0 +1,414 @@
+import streamlit as st
+import inspect
+
+from io import BytesIO
+
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Table,
+    TableStyle,
+    PageBreak,
+    Preformatted
+)
+
+from reportlab.lib.styles import getSampleStyleSheet
+
+
+
+# =====================================================
+# Generate Academic PDF Report
+# =====================================================
+
+
+def generate_pdf(
+    K,
+    S0,
+    T,
+    r,
+    sigma,
+    M,
+    N,
+    explicit_american_put,
+    implicit_american_put,
+    crank_nicolson_american_put
+):
+
+
+    buffer = BytesIO()
+
+
+    doc = SimpleDocTemplate(
+        buffer,
+        title="American Put Option Pricing Using Finite Difference Methods"
+    )
+
+
+    styles = getSampleStyleSheet()
+
+
+    content = []
+
+
+
+    # =====================================================
+    # Title
+    # =====================================================
+
+
+    content.append(
+        Paragraph(
+            "American Put Option Pricing Using Finite Difference Methods",
+            styles["Title"]
+        )
+    )
+
+
+    content.append(
+        Spacer(1,20)
+    )
+
+
+    content.append(
+        Paragraph(
+            "Developer: Milliano Benjamin Kadzilawa",
+            styles["Normal"]
+        )
+    )
+
+
+    content.append(
+        Spacer(1,30)
+    )
+
+
+
+    # =====================================================
+    # Introduction
+    # =====================================================
+
+
+    content.append(
+        Paragraph(
+            "1. Introduction",
+            styles["Heading2"]
+        )
+    )
+
+
+    content.append(
+        Paragraph(
+        """
+American options allow the holder the right to exercise the option
+before maturity. Unlike European options, American options generally
+do not have closed-form solutions; therefore numerical methods are
+required.
+
+This project applies three finite difference methods for pricing an
+American put option:
+Explicit, Implicit and Crank-Nicolson methods.
+""",
+        styles["Normal"]
+        )
+    )
+
+
+
+    # =====================================================
+    # Mathematical Model
+    # =====================================================
+
+
+    content.append(
+        Paragraph(
+            "2. Mathematical Model",
+            styles["Heading2"]
+        )
+    )
+
+
+    content.append(
+        Paragraph(
+        """
+The option price satisfies the Black-Scholes partial differential
+equation:
+
+∂V/∂t + 0.5σ²S²(∂²V/∂S²) + rS(∂V/∂S) - rV = 0
+
+The terminal payoff condition is:
+
+V(S,T)=max(K-S,0)
+
+The American early exercise constraint is:
+
+V(S,t)=max(V(S,t),K-S)
+""",
+        styles["Normal"]
+        )
+    )
+
+
+
+    # =====================================================
+    # Parameters
+    # =====================================================
+
+
+    content.append(
+        Paragraph(
+            "3. Model Parameters",
+            styles["Heading2"]
+        )
+    )
+
+
+    parameters = [
+        ["Parameter","Value"],
+        ["Strike Price (K)",str(K)],
+        ["Initial Stock Price (S0)",str(S0)],
+        ["Maturity (T)",str(T)],
+        ["Risk Free Rate",str(r)],
+        ["Volatility",str(sigma)],
+        ["Space Steps (M)",str(M)],
+        ["Time Steps (N)",str(N)]
+    ]
+
+
+    table = Table(parameters)
+
+
+    table.setStyle(
+        TableStyle(
+            [
+                ("GRID",(0,0),(-1,-1),0.5,None)
+            ]
+        )
+    )
+
+
+    content.append(table)
+
+    content.append(
+        Spacer(1,20)
+    )
+
+
+
+    # =====================================================
+    # Results
+    # =====================================================
+
+
+    explicit_price,_,_ = explicit_american_put(
+        K,S0,T,r,sigma,M,N
+    )
+
+
+    implicit_price,_,_ = implicit_american_put(
+        K,S0,T,r,sigma,M,N
+    )
+
+
+    cn_price,_,_ = crank_nicolson_american_put(
+        K,S0,T,r,sigma,M,N
+    )
+
+
+    content.append(
+        Paragraph(
+            "4. Numerical Results",
+            styles["Heading2"]
+        )
+    )
+
+
+    results = [
+        ["Method","Option Price"],
+        ["Explicit",f"{explicit_price:.6f}"],
+        ["Implicit",f"{implicit_price:.6f}"],
+        ["Crank-Nicolson",f"{cn_price:.6f}"]
+    ]
+
+
+    result_table = Table(results)
+
+
+    result_table.setStyle(
+        TableStyle(
+            [
+                ("GRID",(0,0),(-1,-1),0.5,None)
+            ]
+        )
+    )
+
+
+    content.append(result_table)
+
+
+
+    # =====================================================
+    # Analysis
+    # =====================================================
+
+
+    content.append(
+        Paragraph(
+            "5. Method Comparison Analysis",
+            styles["Heading2"]
+        )
+    )
+
+
+    content.append(
+        Paragraph(
+        """
+The Explicit method is computationally simple but requires a stability
+condition on the time and space discretisation.
+
+The Implicit method improves stability because it solves a system of
+linear equations at every time step.
+
+The Crank-Nicolson method combines the Explicit and Implicit approaches
+and generally provides improved accuracy.
+""",
+        styles["Normal"]
+        )
+    )
+
+
+
+    content.append(
+        PageBreak()
+    )
+
+
+
+    # =====================================================
+    # Appendix - Source Code
+    # =====================================================
+
+
+    content.append(
+        Paragraph(
+            "Appendix: Numerical Method Source Code",
+            styles["Heading2"]
+        )
+    )
+
+
+    methods = [
+        (
+            "Explicit Finite Difference Method",
+            explicit_american_put
+        ),
+
+        (
+            "Implicit Finite Difference Method",
+            implicit_american_put
+        ),
+
+        (
+            "Crank-Nicolson Method",
+            crank_nicolson_american_put
+        )
+    ]
+
+
+
+    for title, method in methods:
+
+
+        content.append(
+            Paragraph(
+                title,
+                styles["Heading3"]
+            )
+        )
+
+
+        code = inspect.getsource(method)
+
+
+        content.append(
+            Preformatted(
+                code,
+                styles["Code"]
+            )
+        )
+
+
+        content.append(
+            Spacer(1,20)
+        )
+
+
+
+    doc.build(content)
+
+
+    buffer.seek(0)
+
+
+    return buffer
+
+
+
+
+
+# =====================================================
+# Export Tab
+# =====================================================
+
+
+def export_report_tab(
+    K,
+    S0,
+    T,
+    r,
+    sigma,
+    M,
+    N,
+    explicit_american_put,
+    implicit_american_put,
+    crank_nicolson_american_put
+):
+
+
+    st.header(
+        "Generate Academic Report"
+    )
+
+
+    st.write(
+    """
+Generate a PDF report suitable for submission.
+The report contains the mathematical formulation,
+results and numerical method appendix.
+"""
+    )
+
+
+    if st.button("Generate Report"):
+
+
+        pdf = generate_pdf(
+            K,
+            S0,
+            T,
+            r,
+            sigma,
+            M,
+            N,
+            explicit_american_put,
+            implicit_american_put,
+            crank_nicolson_american_put
+        )
+
+
+        st.download_button(
+            "Download PDF",
+            pdf,
+            file_name="American_Put_FDM_Report.pdf",
+            mime="application/pdf"
+        )
