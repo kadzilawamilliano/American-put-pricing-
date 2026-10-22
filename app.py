@@ -595,16 +595,18 @@ with tab2:
 
 with tab3:
 
-    convergence_tab(
-        K,
-        S0,
-        T,
-        r,
-        sigma,
-        explicit_american_put,
-        implicit_american_put,
-        crank_nicolson_american_put
-    )
+      convergence_tab(
+    K,
+    S0,
+    T,
+    r,
+    sigma,
+    M,
+    N,
+    explicit_american_put,
+    implicit_american_put,
+    crank_nicolson_american_put
+)
 
 
 
