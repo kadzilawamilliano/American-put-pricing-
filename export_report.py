@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 import inspect
 
 from io import BytesIO
@@ -244,7 +245,69 @@ V(S,t)=max(V(S,t),K-S)
 
 
     content.append(result_table)
+   # ==========================================
+# Convergence Analysis
+# ==========================================
 
+content.append(
+    Paragraph(
+        "5. Convergence Analysis",
+        styles["Heading2"]
+    )
+)
+
+
+if "convergence_results" in st.session_state:
+
+
+    convergence_df = st.session_state[
+        "convergence_results"
+    ]
+
+
+    convergence_data = [
+        list(convergence_df.columns)
+    ]
+
+
+    for row in convergence_df.values.tolist():
+
+        convergence_data.append(
+            [str(x) for x in row]
+        )
+
+
+    convergence_table = Table(
+        convergence_data
+    )
+
+
+    convergence_table.setStyle(
+        TableStyle(
+            [
+                ("GRID",(0,0),(-1,-1),0.5,None)
+            ]
+        )
+    )
+
+
+    content.append(
+        convergence_table
+    )
+
+
+else:
+
+    content.append(
+        Paragraph(
+            """
+Convergence analysis was not executed.
+Run the convergence analysis before
+generating the report.
+""",
+            styles["Normal"]
+        )
+    )
 
 
     # =====================================================
@@ -254,7 +317,7 @@ V(S,t)=max(V(S,t),K-S)
 
     content.append(
         Paragraph(
-            "5. Method Comparison Analysis",
+            "6. Method Comparison Analysis",
             styles["Heading2"]
         )
     )
