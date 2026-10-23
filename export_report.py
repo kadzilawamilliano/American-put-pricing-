@@ -506,17 +506,9 @@ Run the comparison analysis before generating the report.
             )
             )
 
-    content.append(
-        PageBreak()
-    )
-
+    
     
             
-        
-
-
-        
-
 
     # =====================================================
     # Appendix - Source Code
