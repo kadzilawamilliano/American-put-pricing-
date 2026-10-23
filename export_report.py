@@ -250,111 +250,117 @@ V(S,t)=max(V(S,t),K-S)
    # ==========================================
 # Convergence Analysis
 # ==========================================
-
-content.append(
-    Paragraph(
-        "5. Convergence Analysis",
-        styles["Heading2"]
-    )
-)
-
-
-if "convergence_results" in st.session_state:
-
-
-    convergence_df = st.session_state[
-        "convergence_results"
-    ]
-
-
-    convergence_data = [
-        list(convergence_df.columns)
-    ]
-
-
-    for row in convergence_df.values.tolist():
-
-        convergence_data.append(
-            [str(x) for x in row]
-        )
-
-
-    convergence_table = Table(
-        convergence_data
-    )
-
-
-    convergence_table.setStyle(
-        TableStyle(
-            [
-                ("GRID",(0,0),(-1,-1),0.5,None)
-            ]
-        )
-    )
-
-
-    content.append(
-        convergence_table
-    )
-# ==========================================
-# Convergence Plot
-# ==========================================
-
-content.append(
-    Spacer(1,20)
-)
-
-
-content.append(
-    Paragraph(
-        "Convergence Plot",
-        styles["Heading3"]
-    )
-)
-
-
-
-if os.path.exists("convergence_plot.png"):
-
-
-    img = Image(
-        "convergence_plot.png",
-        width=400,
-        height=250
-    )
-
-
-    content.append(
-        img
-    )
-
-
-else:
-
+    # ==========================================
+    # Convergence Analysis
+    # ==========================================
 
     content.append(
         Paragraph(
-            """
-Convergence plot was not available.
-Run convergence analysis before
-generating the report.
-""",
-            styles["Normal"]
+            "5. Convergence Analysis",
+            styles["Heading2"]
         )
     )
 
-else:
 
-    content.append(
-        Paragraph(
-            """
+    if "convergence_results" in st.session_state:
+
+
+        convergence_df = st.session_state[
+            "convergence_results"
+        ]
+
+
+        convergence_data = [
+            list(convergence_df.columns)
+        ]
+
+
+        for row in convergence_df.values.tolist():
+
+            convergence_data.append(
+                [str(x) for x in row]
+            )
+
+
+        convergence_table = Table(
+            convergence_data
+        )
+
+
+        convergence_table.setStyle(
+            TableStyle(
+                [
+                    ("GRID",(0,0),(-1,-1),0.5,None)
+                ]
+            )
+        )
+
+
+        content.append(
+            convergence_table
+        )
+
+
+    else:
+
+        content.append(
+            Paragraph(
+                """
 Convergence analysis was not executed.
 Run the convergence analysis before
 generating the report.
 """,
-            styles["Normal"]
+                styles["Normal"]
+            )
+        )
+
+
+
+    # ==========================================
+    # Convergence Plot
+    # ==========================================
+
+    content.append(
+        Spacer(1,20)
+    )
+
+
+    content.append(
+        Paragraph(
+            "Convergence Plot",
+            styles["Heading3"]
         )
     )
+
+
+    if os.path.exists("convergence_plot.png"):
+
+
+        img = Image(
+            "convergence_plot.png",
+            width=400,
+            height=250
+        )
+
+
+        content.append(
+            img
+        )
+
+
+    else:
+
+
+        content.append(
+            Paragraph(
+                """
+Convergence plot was not available.
+Run convergence analysis before
+generating the report.
+""",
+                styles["Normal"]
+            )
+        )
   
 
     # =====================================================
