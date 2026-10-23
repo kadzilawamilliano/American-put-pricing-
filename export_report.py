@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+from reportlab.platypus import Image
+import os
 import inspect
 
 from io import BytesIO
@@ -294,7 +296,52 @@ if "convergence_results" in st.session_state:
     content.append(
         convergence_table
     )
+# ==========================================
+# Convergence Plot
+# ==========================================
 
+content.append(
+    Spacer(1,20)
+)
+
+
+content.append(
+    Paragraph(
+        "Convergence Plot",
+        styles["Heading3"]
+    )
+)
+
+
+
+if os.path.exists("convergence_plot.png"):
+
+
+    img = Image(
+        "convergence_plot.png",
+        width=400,
+        height=250
+    )
+
+
+    content.append(
+        img
+    )
+
+
+else:
+
+
+    content.append(
+        Paragraph(
+            """
+Convergence plot was not available.
+Run convergence analysis before
+generating the report.
+""",
+            styles["Normal"]
+        )
+    )
 
 else:
 
@@ -308,7 +355,7 @@ generating the report.
             styles["Normal"]
         )
     )
-
+  
 
     # =====================================================
     # Analysis
