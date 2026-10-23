@@ -369,7 +369,9 @@ generating the report.
     # =====================================================
     # Method Comparison Analysis
     # =====================================================
-
+    # =====================================================
+    # Method Comparison Analysis
+    # =====================================================
 
     content.append(
         Paragraph(
@@ -381,53 +383,32 @@ generating the report.
 
     if "comparison_results" in st.session_state:
 
+        comparison_df = st.session_state["comparison_results"]
 
-        comparison_df = st.session_state[
-            "comparison_results"
-        ]
-
-
-        comparison_data = [
-            list(comparison_df.columns)
-        ]
-
+        comparison_data = [list(comparison_df.columns)]
 
         for row in comparison_df.values.tolist():
+            comparison_data.append([str(x) for x in row])
 
-            comparison_data.append(
-                [str(x) for x in row]
-            )
-
-
-        comparison_table = Table(
-            comparison_data
-        )
-
+        comparison_table = Table(comparison_data)
 
         comparison_table.setStyle(
             TableStyle(
                 [
-                    (
-                        "GRID",
-                        (0,0),
-                        (-1,-1),
-                        0.5,
-                        None
-                    )
+                    ("GRID", (0, 0), (-1, -1), 0.5, None)
                 ]
             )
         )
 
-
-        content.append(
-            comparison_table
-        )
-
+        content.append(comparison_table)
 
         content.append(
             Spacer(1,20)
         )
 
+        # ==========================================
+        # Recommendation
+        # ==========================================
 
         content.append(
             Paragraph(
@@ -436,40 +417,105 @@ generating the report.
             )
         )
 
-
-        recommendation = st.session_state[
-            "comparison_recommendation"
-        ]
-
+        recommendation = st.session_state["comparison_recommendation"]
 
         content.append(
             Paragraph(
-                recommendation.replace(
-                    "\n",
-                    "<br/>"
-                ),
+                recommendation.replace("\n","<br/>"),
                 styles["Normal"]
             )
         )
 
+        # ==========================================
+        # Accuracy Plot
+        # ==========================================
 
+        content.append(
+            Spacer(1,20)
+        )
+
+        content.append(
+            Paragraph(
+                "Accuracy Comparison",
+                styles["Heading3"]
+            )
+        )
+
+        if os.path.exists("accuracy_comparison.png"):
+
+            img = Image(
+                "accuracy_comparison.png",
+                width=400,
+                height=250
+            )
+
+            content.append(img)
+
+        else:
+
+            content.append(
+                Paragraph(
+                    "Accuracy comparison plot was not available.",
+                    styles["Normal"]
+                )
+            )
+
+        # ==========================================
+        # Runtime Plot
+        # ==========================================
+
+        content.append(
+            Spacer(1,20)
+        )
+
+        content.append(
+            Paragraph(
+                "Computational Efficiency",
+                styles["Heading3"]
+            )
+        )
+
+        if os.path.exists("runtime_comparison.png"):
+
+            img = Image(
+                "runtime_comparison.png",
+                width=400,
+                height=250
+            )
+
+            content.append(img)
+
+        else:
+
+            content.append(
+                Paragraph(
+                    "Runtime comparison plot was not available.",
+                    styles["Normal"]
+                )
+            )
 
     else:
-
 
         content.append(
             Paragraph(
                 """
 Method comparison was not executed.
-Run the comparison analysis before
-generating the report.
+Run the comparison analysis before generating the report.
 """,
                 styles["Normal"]
             )
-        )
+            )
+
+    content.append(
+        PageBreak()
+    )
 
     
+            
+        
 
+
+        
 
 
     # =====================================================
