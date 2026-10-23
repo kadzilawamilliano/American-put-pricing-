@@ -445,6 +445,12 @@ st.session_state["convergence_results"] = convergence_df
 
 
         st.pyplot(fig)
+        # Save convergence plot for PDF report
+
+fig.savefig(
+    "convergence_plot.png",
+    bbox_inches="tight"
+)
 
 
 
