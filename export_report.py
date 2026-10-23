@@ -578,69 +578,7 @@ Run the comparison analysis before generating the report.
 
     return buffer
 
-content.append(
-    Spacer(1,20)
-)
-
-content.append(
-    Paragraph(
-        "Accuracy Comparison",
-        styles["Heading3"]
-    )
-)
-
-
-if os.path.exists("accuracy_comparison.png"):
-
-    img = Image(
-        "accuracy_comparison.png",
-        width=400,
-        height=250
-    )
-
-    content.append(img)
-
-else:
-
-    content.append(
-        Paragraph(
-            "Accuracy comparison plot was not available.",
-            styles["Normal"]
-        )
-    )
-content.append(
-    Spacer(1,20)
-)
-
-content.append(
-    Paragraph(
-        "Computational Efficiency",
-        styles["Heading3"]
-    )
-)
-
-
-if os.path.exists("runtime_comparison.png"):
-
-    img = Image(
-        "runtime_comparison.png",
-        width=400,
-        height=250
-    )
-
-    content.append(img)
-
-else:
-
-    content.append(
-        Paragraph(
-            "Runtime comparison plot was not available.",
-            styles["Normal"]
-        )
-    )
-
-
-
+        
 # =====================================================
 # Export Tab
 # =====================================================
