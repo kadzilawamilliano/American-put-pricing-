@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+from comparison_analysis import run_comparison
 
 
 def comparison_tab(
@@ -25,79 +26,156 @@ for pricing an American put option.
 
     if st.button("Run All Methods"):
 
-        explicit_price, S, V_explicit = explicit_american_put(
-            K, S0, T, r, sigma, M, N
+
+        # ==========================================
+        # Run comparison analysis
+        # ==========================================
+
+        comparison_df, recommendation = run_comparison(
+            K,
+            S0,
+            T,
+            r,
+            sigma,
+            M,
+            N,
+            explicit_american_put,
+            implicit_american_put,
+            crank_nicolson_american_put
         )
 
-        implicit_price, S, V_implicit = implicit_american_put(
-            K, S0, T, r, sigma, M, N
+
+        # ==========================================
+        # Save comparison results for PDF export
+        # ==========================================
+
+        st.session_state["comparison_results"] = comparison_df
+
+        st.session_state["comparison_recommendation"] = recommendation
+
+
+
+        # ==========================================
+        # Display Results
+        # ==========================================
+
+        st.subheader("Numerical Comparison")
+
+
+        st.dataframe(
+            comparison_df,
+            use_container_width=True
         )
 
-        cn_price, S, V_cn = crank_nicolson_american_put(
-            K, S0, T, r, sigma, M, N
+
+
+        # ==========================================
+        # Error Comparison Plot
+        # ==========================================
+
+        st.subheader(
+            "Accuracy Comparison"
         )
 
-        results = pd.DataFrame(
-            {
-                "Method": [
-                    "Explicit",
-                    "Implicit",
-                    "Crank-Nicolson"
-                ],
-                "Option Price": [
-                    explicit_price,
-                    implicit_price,
-                    cn_price
-                ]
-            }
+
+        fig1, ax1 = plt.subplots(
+            figsize=(8,5)
         )
 
-        st.subheader("Option Prices")
 
-        st.dataframe(results)
-
-        fig, ax = plt.subplots(figsize=(8,5))
-
-        ax.plot(
-            S,
-            V_explicit,
-            label="Explicit"
+        ax1.bar(
+            comparison_df["Method"],
+            comparison_df["Percentage Error (%)"]
         )
 
-        ax.plot(
-            S,
-            V_implicit,
-            label="Implicit"
+
+        ax1.set_ylabel(
+            "Percentage Error (%)"
         )
 
-        ax.plot(
-            S,
-            V_cn,
-            label="Crank-Nicolson"
+
+        ax1.set_title(
+            "Numerical Error Compared With Crank-Nicolson"
         )
 
-        ax.set_xlabel("Stock Price")
 
-        ax.set_ylabel("Option Value")
+        ax1.grid(True)
 
-        ax.set_title(
-            "Comparison of Numerical Methods"
+
+        st.pyplot(fig1)
+
+
+
+        # ==========================================
+        # Runtime Comparison
+        # ==========================================
+
+        st.subheader(
+            "Computational Efficiency"
         )
 
-        ax.legend()
 
-        ax.grid(True)
+        fig2, ax2 = plt.subplots(
+            figsize=(8,5)
+        )
 
-        st.pyplot(fig)
 
-        st.subheader("Discussion")
+        ax2.bar(
+            comparison_df["Method"],
+            comparison_df["Runtime (seconds)"]
+        )
 
-        st.write("""
-The Explicit method is computationally simple but is conditionally stable.
 
-The Implicit method is unconditionally stable and generally produces smoother
-solutions.
+        ax2.set_ylabel(
+            "Runtime (seconds)"
+        )
 
-The Crank–Nicolson method combines the advantages of both methods and
-typically provides the most accurate numerical approximation.
-""")
+
+        ax2.set_title(
+            "Computational Time Comparison"
+        )
+
+
+        ax2.grid(True)
+
+
+        st.pyplot(fig2)
+
+
+
+        # ==========================================
+        # Recommendation
+        # ==========================================
+
+        st.subheader(
+            "Method Selection"
+        )
+
+
+        st.info(
+            recommendation
+        )
+
+
+
+        # ==========================================
+        # Download Results
+        # ==========================================
+
+        csv = comparison_df.to_csv(
+            index=False
+        )
+
+
+        st.download_button(
+
+            label="Download Comparison Results",
+
+            data=csv,
+
+            file_name="finite_difference_comparison.csv",
+
+            mime="text/csv"
+
+        )    
+            
