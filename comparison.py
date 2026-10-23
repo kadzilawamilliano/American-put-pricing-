@@ -104,8 +104,9 @@ for pricing an American put option.
 
         st.pyplot(fig1)
         
-        fig1.savefig("accuracy_comparison.png",
-        bbox_inches="tight"
+        fig1.savefig(
+            "accuracy_comparison.png",
+            bbox_inches="tight"
         )
 
 
@@ -145,8 +146,9 @@ for pricing an American put option.
 
         st.pyplot(fig2)
         
-        fig2.savefig("runtime_comparison.png",
-        bbox_inches="tight"
+        fig2.savefig(
+            "runtime_comparison.png",
+            bbox_inches="tight"
         )
 
 
