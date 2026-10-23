@@ -319,14 +319,14 @@ N = {N_grid}
                 convergence_df,
                 use_container_width=True
             )
-            # Save convergence results for PDF export
+                        # Save convergence results for PDF export
 
-st.session_state["convergence_results"] = convergence_df
+            st.session_state["convergence_results"] = convergence_df
+
 
             progress.progress(
                 (index+1)/total
             )
-
 
 
         # ==================================
@@ -445,12 +445,24 @@ st.session_state["convergence_results"] = convergence_df
 
 
         st.pyplot(fig)
+                st.pyplot(fig)
+
+
         # Save convergence plot for PDF report
 
-fig.savefig(
-    "convergence_plot.png",
-    bbox_inches="tight"
-)
+        fig.savefig(
+            "convergence_plot.png",
+            bbox_inches="tight"
+        )
+
+
+        # ==================================
+        # Download CSV
+        # ==================================
+
+        csv = convergence_df.to_csv(
+            index=False
+        )
 
 
 
