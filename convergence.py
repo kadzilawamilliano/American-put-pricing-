@@ -311,22 +311,24 @@ N = {N_grid}
                 ]
 
             )
-
-
             # Update table while running
 
             table_placeholder.dataframe(
                 convergence_df,
                 use_container_width=True
             )
-                        # Save convergence results for PDF export
-
-            st.session_state["convergence_results"] = convergence_df
 
 
             progress.progress(
                 (index+1)/total
             )
+
+
+        # Save convergence results for PDF export
+        st.session_state["convergence_results"] = convergence_df
+
+            
+            
 
 
         # ==================================
@@ -445,7 +447,7 @@ N = {N_grid}
 
 
         st.pyplot(fig)
-                st.pyplot(fig)
+        st.pyplot(fig)
 
 
         # Save convergence plot for PDF report
@@ -454,7 +456,6 @@ N = {N_grid}
             "convergence_plot.png",
             bbox_inches="tight"
         )
-
 
         # ==================================
         # Download CSV
