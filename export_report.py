@@ -366,6 +366,9 @@ generating the report.
     # =====================================================
     # Analysis
     # =====================================================
+    # =====================================================
+    # Method Comparison Analysis
+    # =====================================================
 
 
     content.append(
@@ -376,27 +379,96 @@ generating the report.
     )
 
 
-    content.append(
-        Paragraph(
-        """
-The Explicit method is computationally simple but requires a stability
-condition on the time and space discretisation.
+    if "comparison_results" in st.session_state:
 
-The Implicit method improves stability because it solves a system of
-linear equations at every time step.
 
-The Crank-Nicolson method combines the Explicit and Implicit approaches
-and generally provides improved accuracy.
-""",
-        styles["Normal"]
+        comparison_df = st.session_state[
+            "comparison_results"
+        ]
+
+
+        comparison_data = [
+            list(comparison_df.columns)
+        ]
+
+
+        for row in comparison_df.values.tolist():
+
+            comparison_data.append(
+                [str(x) for x in row]
+            )
+
+
+        comparison_table = Table(
+            comparison_data
         )
-    )
+
+
+        comparison_table.setStyle(
+            TableStyle(
+                [
+                    (
+                        "GRID",
+                        (0,0),
+                        (-1,-1),
+                        0.5,
+                        None
+                    )
+                ]
+            )
+        )
+
+
+        content.append(
+            comparison_table
+        )
+
+
+        content.append(
+            Spacer(1,20)
+        )
+
+
+        content.append(
+            Paragraph(
+                "Method Selection Recommendation",
+                styles["Heading3"]
+            )
+        )
+
+
+        recommendation = st.session_state[
+            "comparison_recommendation"
+        ]
+
+
+        content.append(
+            Paragraph(
+                recommendation.replace(
+                    "\n",
+                    "<br/>"
+                ),
+                styles["Normal"]
+            )
+        )
 
 
 
-    content.append(
-        PageBreak()
-    )
+    else:
+
+
+        content.append(
+            Paragraph(
+                """
+Method comparison was not executed.
+Run the comparison analysis before
+generating the report.
+""",
+                styles["Normal"]
+            )
+        )
+
+    
 
 
 
