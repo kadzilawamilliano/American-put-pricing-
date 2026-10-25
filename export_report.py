@@ -582,7 +582,157 @@ Run the comparison analysis before generating the report.
             Spacer(1,20)
         )
 
+    # =====================================================
+# Appendix - Comparison and Convergence Analysis Code
+# =====================================================
 
+content.append(
+    PageBreak()
+)
+
+content.append(
+    Paragraph(
+        "Appendix: Comparison and Convergence Analysis Code",
+        styles["Heading2"]
+    )
+)
+
+
+# -------------------------------
+# Comparison Analysis
+# -------------------------------
+
+content.append(
+    Paragraph(
+        "Comparison Analysis Core Code",
+        styles["Heading3"]
+    )
+)
+
+
+comparison_code = """
+
+# High-resolution Crank-Nicolson benchmark
+
+reference_price, _, _ = crank_nicolson_american_put(
+    K,
+    S0,
+    T,
+    r,
+    sigma,
+    1000,
+    10000
+)
+
+
+# Calculate errors
+
+explicit_error = abs(
+    explicit_price - reference_price
+)
+
+implicit_error = abs(
+    implicit_price - reference_price
+)
+
+cn_error = abs(
+    cn_price - reference_price
+)
+
+
+# Percentage errors
+
+explicit_percentage = (
+    explicit_error/reference_price
+)*100
+
+
+implicit_percentage = (
+    implicit_error/reference_price
+)*100
+
+
+cn_percentage = (
+    cn_error/reference_price
+)*100
+
+"""
+
+
+content.append(
+    Preformatted(
+        comparison_code,
+        styles["Code"]
+    )
+)
+
+
+content.append(
+    Spacer(1,20)
+)
+
+
+
+# -------------------------------
+# Convergence Analysis
+# -------------------------------
+
+content.append(
+    Paragraph(
+        "Convergence Analysis Core Code",
+        styles["Heading3"]
+    )
+)
+
+
+convergence_code = """
+
+grid_values = [
+(100,1000),
+(200,2000),
+(300,3000),
+(400,4000)
+]
+
+
+results=[]
+
+
+for M,N in grid_values:
+
+    price,_,_ = crank_nicolson_american_put(
+        K,
+        S0,
+        T,
+        r,
+        sigma,
+        M,
+        N
+    )
+
+    results.append(
+        [M,N,price]
+    )
+
+
+convergence_df = pd.DataFrame(
+    results,
+    columns=[
+        "M",
+        "N",
+        "Option Price"
+    ]
+)
+
+"""
+
+
+content.append(
+    Preformatted(
+        convergence_code,
+        styles["Code"]
+    )
+)
     doc.build(content)
 
     buffer.seek(0)
