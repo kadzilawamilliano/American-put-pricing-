@@ -1,6 +1,6 @@
 import streamlit as st
-from comparison import run_comparison
-from convergence import convergence_tab
+#from comparison import run_comparison
+#from convergence import convergence_tab
 import pandas as pd
 from reportlab.platypus import Image
 import os
@@ -545,17 +545,17 @@ Run the comparison analysis before generating the report.
         (
             "Crank-Nicolson Finite Difference Method",
             crank_nicolson_american_put
-        ),
-
-        (
-            "Comparison Analysis",
-            run_comparison
-        ),
-
-        (
-            "Convergence Analysis",
-            convergence_tab
         )
+
+        #(
+          #  "Comparison Analysis",
+           # run_comparison
+        #)
+
+        #(
+         #   "Convergence Analysis",
+          #  convergence_tab
+       # )
 
     ]
 
