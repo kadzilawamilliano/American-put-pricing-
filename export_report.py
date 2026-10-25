@@ -581,36 +581,36 @@ Run the comparison analysis before generating the report.
         content.append(
             Spacer(1,20)
         )
-
     # =====================================================
-# Appendix - Comparison and Convergence Analysis Code
-# =====================================================
+    # Appendix - Comparison and Convergence Analysis Code
+    # =====================================================
 
-content.append(
-    PageBreak()
-)
-
-content.append(
-    Paragraph(
-        "Appendix: Comparison and Convergence Analysis Code",
-        styles["Heading2"]
+    content.append(
+        PageBreak()
     )
-)
 
 
-# -------------------------------
-# Comparison Analysis
-# -------------------------------
-
-content.append(
-    Paragraph(
-        "Comparison Analysis Core Code",
-        styles["Heading3"]
+    content.append(
+        Paragraph(
+            "Appendix: Comparison and Convergence Analysis Code",
+            styles["Heading2"]
+        )
     )
-)
 
 
-comparison_code = """
+    # -------------------------------
+    # Comparison Analysis
+    # -------------------------------
+
+    content.append(
+        Paragraph(
+            "Comparison Analysis Core Code",
+            styles["Heading3"]
+        )
+    )
+
+
+    comparison_code = """
 
 # High-resolution Crank-Nicolson benchmark
 
@@ -643,59 +643,59 @@ cn_error = abs(
 # Percentage errors
 
 explicit_percentage = (
-    explicit_error/reference_price
-)*100
+    explicit_error / reference_price
+) * 100
 
 
 implicit_percentage = (
-    implicit_error/reference_price
-)*100
+    implicit_error / reference_price
+) * 100
 
 
 cn_percentage = (
-    cn_error/reference_price
-)*100
+    cn_error / reference_price
+) * 100
 
 """
 
 
-content.append(
-    Preformatted(
-        comparison_code,
-        styles["Code"]
+    content.append(
+        Preformatted(
+            comparison_code,
+            styles["Code"]
+        )
     )
-)
 
 
-content.append(
-    Spacer(1,20)
-)
-
-
-
-# -------------------------------
-# Convergence Analysis
-# -------------------------------
-
-content.append(
-    Paragraph(
-        "Convergence Analysis Core Code",
-        styles["Heading3"]
+    content.append(
+        Spacer(1,20)
     )
-)
 
 
-convergence_code = """
+
+    # -------------------------------
+    # Convergence Analysis
+    # -------------------------------
+
+    content.append(
+        Paragraph(
+            "Convergence Analysis Core Code",
+            styles["Heading3"]
+        )
+    )
+
+
+    convergence_code = """
 
 grid_values = [
-(100,1000),
-(200,2000),
-(300,3000),
-(400,4000)
+    (100,1000),
+    (200,2000),
+    (300,3000),
+    (400,4000)
 ]
 
 
-results=[]
+results = []
 
 
 for M,N in grid_values:
@@ -727,17 +727,17 @@ convergence_df = pd.DataFrame(
 """
 
 
-content.append(
-    Preformatted(
-        convergence_code,
-        styles["Code"]
+    content.append(
+        Preformatted(
+            convergence_code,
+            styles["Code"]
+        )
     )
-)
-doc.build(content)
+    doc.build(content)
 
-buffer.seek(0)
+    buffer.seek(0)
 
- return buffer
+    return buffer
          
 # =====================================================
 # Export Tab
