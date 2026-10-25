@@ -239,7 +239,11 @@ def run_comparison(
     # =====================================================
     # 6. Method Recommendation
     # =====================================================
-recommendation = """
+    # =====================================================
+    # 6. Method Recommendation
+    # =====================================================
+
+    recommendation = """
 
 A highly refined Crank-Nicolson solution was used as the
 reference value because no analytical Black-Scholes solution
@@ -265,4 +269,6 @@ while the Explicit method achieved the highest accuracy for the
 selected grid.
 
 """
- return comparison_df, recommendation
+
+
+    return comparison_df, recommendation
