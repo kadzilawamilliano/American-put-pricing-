@@ -239,28 +239,30 @@ def run_comparison(
     # =====================================================
     # 6. Method Recommendation
     # =====================================================
-
-
-    recommendation = """
+     recommendation = """
 
 A highly refined Crank-Nicolson solution was used as the
 reference value because no analytical Black-Scholes solution
 exists for an American put option.
 
-The Explicit method achieved the lowest computational time,
-but its accuracy depends on satisfying the stability condition.
+The comparison results show that the Explicit method achieved
+the smallest numerical error relative to the reference solution,
+with an error of 0.111242%. However, the Explicit method requires
+satisfying a stability condition and may become unstable for
+larger time steps.
 
-The Implicit method provides unconditional stability but
-requires solving a system of equations at each time step.
+The Implicit method provides unconditional stability but produced
+the largest numerical error among the three methods in this test.
 
-The Crank-Nicolson method produced the smallest numerical error
-relative to the high-resolution reference solution while
-maintaining reasonable computational efficiency.
+The Crank-Nicolson method provided a good balance between accuracy
+and computational efficiency. Although its error was slightly
+higher than the Explicit method, it combines improved stability
+with second-order accuracy.
 
-Therefore, Crank-Nicolson provides the best balance between
-accuracy, stability and computational cost for this application.
+Therefore, considering both accuracy and numerical stability,
+the Crank-Nicolson method provides the most balanced approach,
+while the Explicit method achieved the highest accuracy for the
+selected grid.
 
 """
-
-
     return comparison_df, recommendation
