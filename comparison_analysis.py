@@ -124,34 +124,34 @@ implicit_percentage = (
 cn_percentage = (
     cn_error / reference_price
 ) * 100
-    # ==========================================
-    # Stability Check
-    # ==========================================
+# ==========================================
+# Stability Check
+# ==========================================
 
 
-    S_max = 2*K
+S_max = 2*K
 
 
-    dS = S_max/M
+dS = S_max/M
 
-    dt = T/N
-
-
-    stability_parameter = (
-        sigma**2 *
-        S_max**2 *
-        dt /
-        dS**2
-    )
+dt = T/N
 
 
-    if stability_parameter <= 1:
+stability_parameter = (
+    sigma**2 *
+    S_max**2 *
+    dt /
+    dS**2
+)
 
-        explicit_stability = "Stable"
 
-    else:
+if stability_parameter <= 1:
 
-        explicit_stability = "Unstable"
+    explicit_stability = "Stable"
+
+else:
+
+    explicit_stability = "Unstable"
 
 
 
