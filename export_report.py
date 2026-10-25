@@ -733,11 +733,11 @@ content.append(
         styles["Code"]
     )
 )
-    doc.build(content)
+doc.build(content)
 
-    buffer.seek(0)
+buffer.seek(0)
 
-    return buffer
+return buffer
          
 # =====================================================
 # Export Tab
