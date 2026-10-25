@@ -233,21 +233,22 @@ cn_percentage = (
     # ==========================================
     # Recommendation
     # ==========================================
+     recommendation = f"""
+A highly refined Crank–Nicolson solution was used as the benchmark
+because no analytical solution exists for the American put option.
 
+The Explicit method achieved the shortest computational time but
+required satisfaction of the stability condition.
 
-    recommendation = """
+The Implicit method was unconditionally stable but required solving
+a system of linear equations at each time step.
 
-Crank-Nicolson provides the most accurate solution
-because it has the smallest numerical error.
+The Crank–Nicolson method produced the smallest numerical error
+relative to the high-resolution reference while maintaining good
+computational efficiency.
 
-The Explicit method has the lowest computational
-cost but requires a stability condition.
-
-The Implicit method provides strong stability but
-requires solving a system of equations.
-
-Therefore, Crank-Nicolson provides the best balance
-between accuracy and numerical stability.
+Therefore, Crank–Nicolson provided the best balance between accuracy
+and computational cost for this application.
 """
 
 
