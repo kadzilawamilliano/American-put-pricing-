@@ -174,10 +174,17 @@ cn_percentage = (
 
             "Option Price":
             [
-                explicit_price,
-                implicit_price,
-                cn_price
+             explicit_price,
+            implicit_price,
+            cn_price
             ],
+
+           "Reference Price":
+           [
+            reference_price,
+            reference_price,
+            reference_price
+           ],
 
 
             "Absolute Error":
