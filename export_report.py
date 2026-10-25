@@ -1,4 +1,6 @@
 import streamlit as st
+from comparison import run_comparison
+from convergence import convergence_tab
 import pandas as pd
 from reportlab.platypus import Image
 import os
@@ -513,20 +515,23 @@ Run the comparison analysis before generating the report.
     # =====================================================
     # Appendix - Source Code
     # =====================================================
+        # =====================================================
+    # Appendix - Source Code
+    # =====================================================
+
     content.append(
-    PageBreak()
+        PageBreak()
     )
-    
 
     content.append(
         Paragraph(
-            "Appendix: Numerical Method Source Code",
+            "Appendix: Source Code",
             styles["Heading2"]
         )
     )
 
-
     methods = [
+
         (
             "Explicit Finite Difference Method",
             explicit_american_put
@@ -538,15 +543,24 @@ Run the comparison analysis before generating the report.
         ),
 
         (
-            "Crank-Nicolson Method",
+            "Crank-Nicolson Finite Difference Method",
             crank_nicolson_american_put
+        ),
+
+        (
+            "Comparison Analysis",
+            run_comparison
+        ),
+
+        (
+            "Convergence Analysis",
+            convergence_tab
         )
+
     ]
 
 
-
     for title, method in methods:
-
 
         content.append(
             Paragraph(
@@ -555,9 +569,7 @@ Run the comparison analysis before generating the report.
             )
         )
 
-
         code = inspect.getsource(method)
-
 
         content.append(
             Preformatted(
@@ -566,22 +578,17 @@ Run the comparison analysis before generating the report.
             )
         )
 
-
         content.append(
             Spacer(1,20)
         )
 
 
-
     doc.build(content)
-
 
     buffer.seek(0)
 
-
     return buffer
-
-        
+         
 # =====================================================
 # Export Tab
 # =====================================================
