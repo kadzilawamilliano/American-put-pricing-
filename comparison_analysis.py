@@ -88,8 +88,8 @@ def run_comparison(
         T,
         r,
         sigma,
-        500,
-        5000
+        200,
+        2000
     )
 
 
