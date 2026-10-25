@@ -72,40 +72,58 @@ def run_comparison(
     # ==========================================
     # Use Crank-Nicolson as Reference
     # ==========================================
+     # ==========================================
+          # ==========================================
+# High-Resolution Reference Solution
+# ==========================================
+# Since there is no analytical Black–Scholes
+# solution for an American put option,
+# a highly refined Crank–Nicolson solution
+# is used as the benchmark.
+
+reference_price, _, _ = crank_nicolson_american_put(
+    K,
+    S0,
+    T,
+    r,
+    sigma,
+    1000,      # Fine spatial grid
+    10000      # Fine time grid
+)
 
 
-    reference = cn_price
+# ==========================================
+# Absolute Errors
+# ==========================================
+
+explicit_error = abs(
+    explicit_price - reference_price
+)
+
+implicit_error = abs(
+    implicit_price - reference_price
+)
+
+cn_error = abs(
+    cn_price - reference_price
+)
 
 
+# ==========================================
+# Percentage Errors
+# ==========================================
 
-    explicit_error = abs(
-        explicit_price - reference
-    )
+explicit_percentage = (
+    explicit_error / reference_price
+) * 100
 
+implicit_percentage = (
+    implicit_error / reference_price
+) * 100
 
-    implicit_error = abs(
-        implicit_price - reference
-    )
-
-
-    cn_error = 0
-
-
-
-    explicit_percentage = (
-        explicit_error / reference
-    ) * 100
-
-
-    implicit_percentage = (
-        implicit_error / reference
-    ) * 100
-
-
-    cn_percentage = 0
-
-
-
+cn_percentage = (
+    cn_error / reference_price
+) * 100
     # ==========================================
     # Stability Check
     # ==========================================
