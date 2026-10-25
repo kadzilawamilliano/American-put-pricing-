@@ -265,4 +265,4 @@ while the Explicit method achieved the highest accuracy for the
 selected grid.
 
 """
-    return comparison_df, recommendation
+return comparison_df, recommendation
