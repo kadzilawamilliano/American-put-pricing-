@@ -239,7 +239,7 @@ def run_comparison(
     # =====================================================
     # 6. Method Recommendation
     # =====================================================
-     recommendation = """
+recommendation = """
 
 A highly refined Crank-Nicolson solution was used as the
 reference value because no analytical Black-Scholes solution
