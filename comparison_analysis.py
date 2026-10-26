@@ -89,7 +89,7 @@ def run_comparison(
     T,
     r,
     sigma,
-    5000
+    2000
     )
 
 
