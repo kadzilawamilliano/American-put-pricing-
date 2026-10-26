@@ -1,5 +1,6 @@
 import time
 import pandas as pd
+from binomial import american_put_binomial
 
 
 def run_comparison(
@@ -82,14 +83,13 @@ def run_comparison(
     # =====================================================
 
 
-    reference_price, _, _ = crank_nicolson_american_put(
-        K,
-        S0,
-        T,
-        r,
-        sigma,
-        200,
-        2000
+    reference_price = american_put_binomial(
+    K,
+    S0,
+    T,
+    r,
+    sigma,
+    5000
     )
 
 
@@ -187,7 +187,7 @@ def run_comparison(
             ],
 
 
-            "Reference Price":
+            "Binomial Reference Price":
             [
                 reference_price,
                 reference_price,
@@ -245,9 +245,7 @@ def run_comparison(
 
     recommendation = """
 
-A highly refined Crank-Nicolson solution was used as the
-reference value because no analytical Black-Scholes solution
-exists for an American put option.
+A Cox–Ross–Rubinstein binomial tree with a large number of time steps was used as the reference solution because no analytical Black–Scholes solution exists for the American put option.
 
 The comparison results show that the Explicit method achieved
 the smallest numerical error relative to the reference solution,
